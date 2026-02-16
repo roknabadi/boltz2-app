@@ -1,0 +1,20 @@
+# Boltz-2 Structure Prediction App Dependencies
+# For Lightning AI deployment
+
+# Core ML dependencies
+boltz[cuda]>=1.0.0
+cuequivariance-ops-torch-cu12  # Required for optimized CUDA kernels
+
+# Web interface
+gradio>=4.0.0
+
+# Data processing
+numpy>=2.0.0
+pyyaml>=6.0.0
+
+# Visualization (for local structure handling)
+py3Dmol>=2.0.0
+matplotlib>=3.7.0  # For PAE and pLDDT plots
+
+# Utilities
+tqdm>=4.65.0
