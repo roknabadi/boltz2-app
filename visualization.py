@@ -79,7 +79,7 @@ $(function(){{
       return '#ff7d45';
     }}, arrows:true, tubes:true
   }}}});
-  v.setStyle({{resn:['LIG','UNK','UNL']}},{{
+  v.setStyle({{hetflag:true}},{{
     stick:{{colorscheme:'purpleCarbon',radius:0.2}},
     sphere:{{scale:0.25}}
   }});
