@@ -165,7 +165,6 @@ def predict_structure(
         conf = find_confidence_files(os.path.dirname(result))
         if not conf["pae"] and not conf["plddt"]:
             conf = find_confidence_files(job_dir)
-
         pae_img = plddt_img = None
         plddt_scores = None
 

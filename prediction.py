@@ -19,13 +19,20 @@ MAX_SEQ_LENGTH = 2500
 PREDICTION_TIMEOUT = 1800  # 30 minutes
 
 OLIGOMER_NAMES = {
-    1: "monomer", 2: "dimer", 3: "trimer", 4: "tetramer",
-    5: "pentamer", 6: "hexamer", 7: "heptamer", 8: "octamer",
+    1: "monomer",
+    2: "dimer",
+    3: "trimer",
+    4: "tetramer",
+    5: "pentamer",
+    6: "hexamer",
+    7: "heptamer",
+    8: "octamer",
 }
 
 # ---------------------------------------------------------------------------
 # Input parsing / validation
 # ---------------------------------------------------------------------------
+
 
 def parse_fasta(fasta_text: str) -> tuple[str, str]:
     """Return (header, sequence) from FASTA or raw sequence text."""
@@ -49,7 +56,9 @@ def parse_fasta(fasta_text: str) -> tuple[str, str]:
 
     # Sanitise header for filenames
     if header:
-        header = "".join(c if c.isalnum() or c == "_" else "_" for c in header)[:30]
+        header = "".join(c if c.isalnum() or c == "_" else "_" for c in header)[
+            :30
+        ]
 
     return header, sequence
 
@@ -63,7 +72,10 @@ def validate_protein(sequence: str) -> tuple[bool, str]:
     if len(seq) < MIN_SEQ_LENGTH:
         return False, f"Sequence too short (minimum {MIN_SEQ_LENGTH} residues)"
     if len(seq) > MAX_SEQ_LENGTH:
-        return False, f"Sequence too long ({len(seq)} aa). Max {MAX_SEQ_LENGTH} due to GPU memory."
+        return (
+            False,
+            f"Sequence too long ({len(seq)} aa). Max {MAX_SEQ_LENGTH} due to GPU memory.",
+        )
     return True, seq
 
 
@@ -86,6 +98,7 @@ def oligomer_name(n: int) -> str:
 # ---------------------------------------------------------------------------
 # YAML generation
 # ---------------------------------------------------------------------------
+
 
 def create_boltz_yaml(
     sequence: str,
@@ -130,16 +143,24 @@ def create_boltz_yaml(
 # Boltz-2 runner
 # ---------------------------------------------------------------------------
 
-def _build_command(yaml_path: str, output_dir: str, sampling_steps: int,
-                   seq_len: int) -> list[str]:
+
+def _build_command(
+    yaml_path: str, output_dir: str, sampling_steps: int, seq_len: int
+) -> list[str]:
     """Assemble the `boltz predict` CLI invocation."""
     cmd = [
-        "boltz", "predict", yaml_path,
-        "--out_dir", output_dir,
-        "--sampling_steps", str(sampling_steps),
-        "--accelerator", "gpu",
+        "boltz",
+        "predict",
+        yaml_path,
+        "--out_dir",
+        output_dir,
+        "--sampling_steps",
+        str(sampling_steps),
+        "--accelerator",
+        "gpu",
         "--override",
         "--use_msa_server",
+        "--write_full_pae",
     ]
     if seq_len > 1000:
         cmd += ["--recycling_steps", "1", "--diffusion_samples", "1"]
@@ -151,8 +172,11 @@ def _build_command(yaml_path: str, output_dir: str, sampling_steps: int,
 def _find_predictions_dir(output_dir: str) -> str | None:
     """Locate the predictions/ folder Boltz creates."""
     for pattern in ["boltz_results_*"]:
-        dirs = sorted(glob.glob(os.path.join(output_dir, pattern)),
-                      key=os.path.getmtime, reverse=True)
+        dirs = sorted(
+            glob.glob(os.path.join(output_dir, pattern)),
+            key=os.path.getmtime,
+            reverse=True,
+        )
         if dirs:
             pred = os.path.join(dirs[0], "predictions")
             if os.path.isdir(pred):
@@ -187,8 +211,10 @@ def _collect_metrics(json_files: list[str]) -> dict:
 def _extract_error(output: str, seq_len: int, log_path: str) -> str:
     """Return a human-friendly error from Boltz stderr/stdout."""
     if "CUDA out of memory" in output or "OutOfMemoryError" in output:
-        return (f"GPU out of memory. Sequence ({seq_len} aa) is too long for "
-                "this GPU. Try shorter or use a bigger GPU.")
+        return (
+            f"GPU out of memory. Sequence ({seq_len} aa) is too long for "
+            "this GPU. Try shorter or use a bigger GPU."
+        )
     if "No such file or directory" in output:
         return "Input file error — check your sequence format."
     if "KeyError" in output:
@@ -198,8 +224,7 @@ def _extract_error(output: str, seq_len: int, log_path: str) -> str:
 
     lines = output.split("\n")
     # Look for a Python traceback
-    tb_start = next((i for i, l in enumerate(lines)
-                     if "Traceback" in l), None)
+    tb_start = next((i for i, l in enumerate(lines) if "Traceback" in l), None)
     if tb_start is not None:
         tail = [l for l in lines[tb_start:] if l.strip()][-20:]
         return "Prediction failed:\n" + "\n".join(tail)
@@ -209,14 +234,22 @@ def _extract_error(output: str, seq_len: int, log_path: str) -> str:
     if errs:
         return "\n".join(errs[-5:])
 
-    clean = [l for l in lines if l.strip()
-             and not any(x in l for x in ["%|", "it/s", "━", "warnings.warn"])]
+    clean = [
+        l
+        for l in lines
+        if l.strip()
+        and not any(x in l for x in ["%|", "it/s", "━", "warnings.warn"])
+    ]
     return "\n".join(clean[-15:]) or f"Unknown error — see {log_path}"
 
 
-def run_prediction(yaml_path: str, output_dir: str, *,
-                   sampling_steps: int = 50,
-                   seq_len: int = 0) -> tuple[bool, str, dict, str]:
+def run_prediction(
+    yaml_path: str,
+    output_dir: str,
+    *,
+    sampling_steps: int = 50,
+    seq_len: int = 0,
+) -> tuple[bool, str, dict, str]:
     """
     Execute Boltz-2 and return (success, structure_path_or_error, metrics, raw_log).
     """
@@ -227,18 +260,23 @@ def run_prediction(yaml_path: str, output_dir: str, *,
     raw_log = f"Command: {' '.join(cmd)}\n\n"
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True,
-                                timeout=PREDICTION_TIMEOUT)
-        raw_log += (f"Return code: {result.returncode}\n\n"
-                    f"=== STDOUT ===\n{result.stdout or '(empty)'}\n\n"
-                    f"=== STDERR ===\n{result.stderr or '(empty)'}")
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=PREDICTION_TIMEOUT
+        )
+        raw_log += (
+            f"Return code: {result.returncode}\n\n"
+            f"=== STDOUT ===\n{result.stdout or '(empty)'}\n\n"
+            f"=== STDERR ===\n{result.stderr or '(empty)'}"
+        )
         with open(log_path, "w") as fh:
             fh.write(raw_log)
 
         pred_dir = _find_predictions_dir(output_dir)
         cif = pdb = json_files = []
         if pred_dir:
-            _g = lambda ext: glob.glob(os.path.join(pred_dir, "**", ext), recursive=True)
+            _g = lambda ext: glob.glob(
+                os.path.join(pred_dir, "**", ext), recursive=True
+            )
             cif, pdb, json_files = _g("*.cif"), _g("*.pdb"), _g("*.json")
 
         structure = (cif or pdb or [None])[0]
@@ -251,6 +289,11 @@ def run_prediction(yaml_path: str, output_dir: str, *,
     except subprocess.TimeoutExpired:
         return False, "Prediction timed out (>30 min).", {}, raw_log
     except FileNotFoundError:
-        return False, "Boltz-2 not found. Ensure 'boltz' is installed and on PATH.", {}, ""
+        return (
+            False,
+            "Boltz-2 not found. Ensure 'boltz' is installed and on PATH.",
+            {},
+            "",
+        )
     except Exception as exc:
         return False, f"Error running Boltz-2: {exc}", {}, raw_log
