@@ -8,12 +8,11 @@ echo "════════════════════════�
 echo ""
 
 # Detect environment
-if [ -n "$LIGHTNING_CLOUDSPACE_ID" ]; then
+if [ -d "/teamspace" ] || [ -n "$LIGHTNING_CLOUDSPACE_ID" ] || [ -n "$LIGHTNING_CLUSTER_ID" ]; then
     echo "✓ Lightning AI Studio detected"
 else
     echo "Running locally"
-    # Create venv if not in a Studio or existing venv
-    if [ -z "$VIRTUAL_ENV" ] && [ ! -d "venv" ]; then
+    if [ -z "$VIRTUAL_ENV" ] && [ -z "$CONDA_DEFAULT_ENV" ] && [ ! -d "venv" ]; then
         echo "Creating virtual environment..."
         python -m venv venv
     fi
