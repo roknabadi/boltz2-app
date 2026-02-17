@@ -16,12 +16,19 @@ import gradio as gr
 THEME = gr.themes.Soft(
     primary_hue=gr.themes.colors.violet,
     secondary_hue=gr.themes.colors.teal,
-    neutral_hue=gr.themes.colors.slate,
+    neutral_hue=gr.themes.colors.gray,
 ).set(
     color_accent="#b54ce5",
     color_accent_soft="rgba(181, 76, 229, 0.1)",
     button_primary_background_fill="linear-gradient(90deg, #b54ce5 0%, #8081e9 50%, #5bc5dc 100%)",
     button_primary_background_fill_hover="linear-gradient(90deg, #a040d0 0%, #7070d8 50%, #4fb5d0 100%)",
+    block_background_fill="#ffffff",
+    block_label_background_fill="#f8f9fc",
+    body_background_fill="linear-gradient(135deg, #f8f9fc 0%, #eef1f8 100%)",
+    background_fill_primary="#ffffff",
+    background_fill_secondary="#f8f9fc",
+    border_color_primary="#e0e0e0",
+    input_background_fill="#ffffff",
 )
 
 # ---------------------------------------------------------------------------
