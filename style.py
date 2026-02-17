@@ -132,17 +132,20 @@ button.secondary, button[variant="secondary"] {
 .accordion, [class*="accordion"], .gr-accordion,
 div[data-testid="accordion"],
 .gr-group, .gr-box, .gr-form, .gr-panel {
-    background: var(--c-accent-bg) !important;
-    border: 1px solid #e8e0f0 !important; border-radius: 8px !important;
+    background: var(--c-surface) !important;
+    border: 1px solid #e0e0e0 !important; border-radius: 8px !important;
 }
 .accordion > button, [class*="accordion"] > button,
 button[aria-expanded], .label-wrap {
-    background: #f3eef8 !important; color: var(--c-navy) !important; font-weight: 600 !important;
+    background: var(--c-bg) !important; color: var(--c-navy) !important; font-weight: 600 !important;
 }
 .gr-accordion *, [class*="accordion"] *, div[data-testid="accordion"] * {
-    color: var(--c-text) !important; background-color: transparent !important;
+    color: var(--c-text) !important;
 }
-.gr-accordion, [class*="accordion"], div[data-testid="accordion"] { background: var(--c-accent-bg) !important; }
+.gr-accordion, [class*="accordion"], div[data-testid="accordion"] { background: var(--c-surface) !important; }
+.gr-accordion > div, [class*="accordion"] > div {
+    background: var(--c-surface) !important;
+}
 .accordion button span, [class*="accordion"] button span { color: var(--c-navy) !important; }
 
 input[type="range"] { accent-color: var(--c-purple) !important; }
