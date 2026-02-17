@@ -37,6 +37,25 @@ THEME = gr.themes.Soft(
 # ---------------------------------------------------------------------------
 
 CSS = """
+/* ── force light mode even when system prefers dark ──────────── */
+.dark {
+    --background-fill-primary: #ffffff !important;
+    --background-fill-secondary: #f8f9fc !important;
+    --block-background-fill: #ffffff !important;
+    --block-label-background-fill: #f8f9fc !important;
+    --body-background-fill: linear-gradient(135deg, #f8f9fc 0%, #eef1f8 100%) !important;
+    --input-background-fill: #ffffff !important;
+    --border-color-primary: #e0e0e0 !important;
+    --body-text-color: #1a1a1a !important;
+    --block-title-text-color: #1a1a1a !important;
+    --block-label-text-color: #1a1a1a !important;
+    --neutral-50: #f9fafb !important;
+    --neutral-100: #f3f4f6 !important;
+    --neutral-200: #e5e7eb !important;
+    --neutral-700: #374151 !important;
+    --neutral-800: #1f2937 !important;
+}
+
 /* ── palette ─────────────────────────────────────────────────── */
 :root {
     --c-purple:   #b54ce5;
@@ -139,21 +158,31 @@ button.secondary, button[variant="secondary"] {
 .accordion, [class*="accordion"], .gr-accordion,
 div[data-testid="accordion"],
 .gr-group, .gr-box, .gr-form, .gr-panel {
-    background: var(--c-surface) !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     border: 1px solid #e0e0e0 !important; border-radius: 8px !important;
 }
 .accordion > button, [class*="accordion"] > button,
 button[aria-expanded], .label-wrap {
-    background: var(--c-bg) !important; color: var(--c-navy) !important; font-weight: 600 !important;
+    background: #f0f0f5 !important; color: var(--c-navy) !important; font-weight: 600 !important;
 }
-.gr-accordion *, [class*="accordion"] *, div[data-testid="accordion"] * {
+/* Force ALL nested elements inside accordion to have light backgrounds */
+.gr-accordion *, .gr-accordion div,
+[class*="accordion"] *, [class*="accordion"] div,
+div[data-testid="accordion"] *, div[data-testid="accordion"] div {
     color: var(--c-text) !important;
+    background-color: #ffffff !important;
 }
-.gr-accordion, [class*="accordion"], div[data-testid="accordion"] { background: var(--c-surface) !important; }
-.gr-accordion > div, [class*="accordion"] > div {
-    background: var(--c-surface) !important;
+/* Re-apply specific backgrounds that need to differ */
+.gr-accordion button[aria-expanded], [class*="accordion"] button[aria-expanded] {
+    background-color: #f0f0f5 !important;
 }
-.accordion button span, [class*="accordion"] button span { color: var(--c-navy) !important; }
+.gr-accordion input[type="range"], [class*="accordion"] input[type="range"] {
+    background-color: transparent !important;
+}
+.gr-accordion input[type="checkbox"], [class*="accordion"] input[type="checkbox"] {
+    background-color: transparent !important;
+}
 
 input[type="range"] { accent-color: var(--c-purple) !important; }
 input[type="checkbox"] { accent-color: #22c55e !important; cursor: pointer !important; }
