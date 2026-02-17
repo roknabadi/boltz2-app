@@ -160,7 +160,6 @@ def _build_command(
         "gpu",
         "--override",
         "--use_msa_server",
-        "--write_full_pae",
     ]
     if seq_len > 1000:
         cmd += ["--recycling_steps", "1", "--diffusion_samples", "1"]

@@ -13,8 +13,10 @@ import numpy as np
 
 try:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
     HAS_MPL = True
 except ImportError:
     HAS_MPL = False
@@ -26,8 +28,9 @@ PLDDT_COLORS = {
     90: "#0053d6",  # very high — blue
     70: "#65cbf3",  # confident — cyan
     50: "#ffdb13",  # low — yellow
-    0:  "#ff7d45",  # very low — orange
+    0: "#ff7d45",  # very low — orange
 }
+
 
 def _plddt_color(score: float) -> str:
     for threshold in (90, 70, 50):
@@ -87,21 +90,29 @@ $(function(){{
 
 def viewer_html(structure_text: str, fmt: str = "cif") -> str:
     """Return an <iframe> embedding a 3Dmol.js viewer for *structure_text*."""
-    escaped = (structure_text
-               .replace("\\", "\\\\")
-               .replace("`", "\\`").replace("$", "\\$")
-               .replace("\r\n", "\\n").replace("\r", "\\n").replace("\n", "\\n")
-               .replace("'", "\\'").replace('"', '\\"'))
+    escaped = (
+        structure_text.replace("\\", "\\\\")
+        .replace("`", "\\`")
+        .replace("$", "\\$")
+        .replace("\r\n", "\\n")
+        .replace("\r", "\\n")
+        .replace("\n", "\\n")
+        .replace("'", "\\'")
+        .replace('"', '\\"')
+    )
     inner = _VIEWER_TEMPLATE.format(data=escaped, fmt=fmt)
     b64 = base64.b64encode(inner.encode()).decode()
-    return (f'<iframe src="data:text/html;base64,{b64}" '
-            f'style="width:100%;height:500px;border:none;border-radius:12px;'
-            f'background:#1a1a2e" sandbox="allow-scripts allow-same-origin"></iframe>')
+    return (
+        f'<iframe src="data:text/html;base64,{b64}" '
+        f'style="width:100%;height:500px;border:none;border-radius:12px;'
+        f'background:#1a1a2e" sandbox="allow-scripts allow-same-origin"></iframe>'
+    )
 
 
 # ---------------------------------------------------------------------------
 # Confidence plots
 # ---------------------------------------------------------------------------
+
 
 def plot_pae(matrix: np.ndarray, out_path: str) -> Optional[str]:
     """Create and save a PAE heatmap. Returns *out_path* on success."""
@@ -117,14 +128,20 @@ def plot_pae(matrix: np.ndarray, out_path: str) -> Optional[str]:
         n = matrix.shape[0]
         step = 150 if n > 500 else (50 if n > 200 else 25)
         ticks = np.arange(0, n, step)
-        ax.set_xticks(ticks); ax.set_xticklabels(ticks + 1)
-        ax.set_yticks(ticks); ax.set_yticklabels(ticks + 1)
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(ticks + 1)
+        ax.set_yticks(ticks)
+        ax.set_yticklabels(ticks + 1)
         ax.set_xlabel("Scored Residue", fontsize=12)
         ax.set_ylabel("Aligned Residue", fontsize=12)
 
         # Dark theme
         for obj in (ax, fig):
-            obj.set_facecolor("#1a1a2e") if hasattr(obj, "set_facecolor") else None
+            (
+                obj.set_facecolor("#1a1a2e")
+                if hasattr(obj, "set_facecolor")
+                else None
+            )
             getattr(obj.patch, "set_facecolor", lambda _: None)("#1a1a2e")
         ax.tick_params(colors="white")
         for lbl in (ax.xaxis.label, ax.yaxis.label):
@@ -139,8 +156,13 @@ def plot_pae(matrix: np.ndarray, out_path: str) -> Optional[str]:
         fig.set_facecolor("#1a1a2e")
         ax.set_facecolor("#1a1a2e")
         plt.tight_layout()
-        plt.savefig(out_path, dpi=150, facecolor="#1a1a2e",
-                    bbox_inches="tight", pad_inches=0.1)
+        plt.savefig(
+            out_path,
+            dpi=150,
+            facecolor="#1a1a2e",
+            bbox_inches="tight",
+            pad_inches=0.1,
+        )
         plt.close(fig)
         return out_path
     except Exception as exc:
@@ -160,22 +182,35 @@ def plot_plddt(scores: np.ndarray, out_path: str) -> Optional[str]:
         ax.plot(x, scores, color="#0053d6", linewidth=1.5)
 
         # Confidence bands
-        bands = [(90, 100, "#0053d6", "Very high (>90)"),
-                 (70, 90,  "#65cbf3", "Confident (70-90)"),
-                 (50, 70,  "#ffdb13", "Low (50-70)"),
-                 (0,  50,  "#ff7d45", "Very low (<50)")]
+        bands = [
+            (90, 100, "#0053d6", "Very high (>90)"),
+            (70, 90, "#65cbf3", "Confident (70-90)"),
+            (50, 70, "#ffdb13", "Low (50-70)"),
+            (0, 50, "#ff7d45", "Very low (<50)"),
+        ]
         for lo, hi, c, lbl in bands:
             ax.axhspan(lo, hi, alpha=0.1, color=c, label=lbl)
 
-        ax.set(xlabel="Residue Position", ylabel="pLDDT Score",
-               xlim=(1, len(scores)), ylim=(0, 100))
+        ax.set(
+            xlabel="Residue Position",
+            ylabel="pLDDT Score",
+            xlim=(1, len(scores)),
+            ylim=(0, 100),
+        )
         ax.legend(loc="lower right", fontsize=9, framealpha=0.9)
-        ax.grid(True, alpha=0.3, linestyle="--"); ax.set_axisbelow(True)
-        ax.set_facecolor("white"); fig.patch.set_facecolor("white")
+        ax.grid(True, alpha=0.3, linestyle="--")
+        ax.set_axisbelow(True)
+        ax.set_facecolor("white")
+        fig.patch.set_facecolor("white")
 
         plt.tight_layout()
-        plt.savefig(out_path, dpi=150, facecolor="white",
-                    bbox_inches="tight", pad_inches=0.1)
+        plt.savefig(
+            out_path,
+            dpi=150,
+            facecolor="white",
+            bbox_inches="tight",
+            pad_inches=0.1,
+        )
         plt.close(fig)
         return out_path
     except Exception as exc:
@@ -187,6 +222,7 @@ def plot_plddt(scores: np.ndarray, out_path: str) -> Optional[str]:
 # Confidence-file discovery
 # ---------------------------------------------------------------------------
 
+
 def find_confidence_files(base_dir: str) -> dict:
     """Search *base_dir* (and parents) for PAE/pLDDT npz and confidence JSON."""
     result = {"pae": None, "plddt": None, "confidence_json": None}
@@ -197,15 +233,30 @@ def find_confidence_files(base_dir: str) -> dict:
             dirs.append(p)
 
     for d in dirs:
+        # Search for ALL npz files (not just pae/plddt named ones)
         for f in glob.glob(os.path.join(d, "**", "*.npz"), recursive=True):
             name = os.path.basename(f).lower()
+            print(f"  [confidence] Found npz: {f}")
             if "pae" in name and not result["pae"]:
                 result["pae"] = f
             elif "plddt" in name and not result["plddt"]:
                 result["plddt"] = f
-        for f in glob.glob(os.path.join(d, "**", "confidence*.json"), recursive=True):
+        for f in glob.glob(
+            os.path.join(d, "**", "confidence*.json"), recursive=True
+        ):
+            print(f"  [confidence] Found JSON: {f}")
             if not result["confidence_json"]:
                 result["confidence_json"] = f
+        # Also look for any JSON in predictions that might contain PAE
+        if not result["confidence_json"]:
+            for f in glob.glob(os.path.join(d, "**", "*.json"), recursive=True):
+                if not result["confidence_json"]:
+                    print(f"  [confidence] Found alt JSON: {f}")
+                    result["confidence_json"] = f
+
+    print(
+        f"  [confidence] Result: pae={result['pae']}, plddt={result['plddt']}, json={result['confidence_json']}"
+    )
     return result
 
 
@@ -213,12 +264,17 @@ def find_confidence_files(base_dir: str) -> dict:
 # pLDDT score loaders
 # ---------------------------------------------------------------------------
 
+
 def _squeeze_array(arr: np.ndarray) -> np.ndarray:
     """Remove batch dims, flatten, and scale 0-1 → 0-100 if needed."""
     if arr.ndim == 3:
         arr = arr[0]
     if arr.ndim == 2:
-        arr = arr.mean(axis=-1) if arr.shape[-1] < arr.shape[0] else arr.mean(axis=0)
+        arr = (
+            arr.mean(axis=-1)
+            if arr.shape[-1] < arr.shape[0]
+            else arr.mean(axis=0)
+        )
     arr = arr.flatten()
     if arr.max() <= 1.0:
         arr = arr * 100
@@ -260,7 +316,11 @@ def extract_plddt_from_cif(cif_path: str) -> Optional[np.ndarray]:
                         in_atom = False
                         continue
                     parts = line.split()
-                    if len(parts) > max(b_idx, res_idx) and b_idx >= 0 and res_idx >= 0:
+                    if (
+                        len(parts) > max(b_idx, res_idx)
+                        and b_idx >= 0
+                        and res_idx >= 0
+                    ):
                         try:
                             rid = int(parts[res_idx])
                             if rid not in by_residue:
@@ -274,16 +334,21 @@ def extract_plddt_from_cif(cif_path: str) -> Optional[np.ndarray]:
         return None
 
 
-def load_plddt(*, npz_path: str | None = None,
-               json_path: str | None = None,
-               cif_path: str | None = None) -> Optional[np.ndarray]:
+def load_plddt(
+    *,
+    npz_path: str | None = None,
+    json_path: str | None = None,
+    cif_path: str | None = None,
+) -> Optional[np.ndarray]:
     """Try CIF → npz → JSON to get pLDDT scores."""
     if cif_path and os.path.exists(cif_path):
         arr = extract_plddt_from_cif(cif_path)
         if arr is not None and len(arr):
             return arr
     if npz_path and os.path.exists(npz_path):
-        arr = _load_npz(npz_path, ["plddt", "predicted_lddt", "confidence", "data"])
+        arr = _load_npz(
+            npz_path, ["plddt", "predicted_lddt", "confidence", "data"]
+        )
         if arr is not None:
             return arr
     if json_path and os.path.exists(json_path):
@@ -299,6 +364,61 @@ def load_plddt(*, npz_path: str | None = None,
     return None
 
 
-def load_pae(npz_path: str) -> Optional[np.ndarray]:
-    """Load a PAE matrix from an npz file."""
-    return _load_npz(npz_path, ["pae", "predicted_aligned_error", "data"])
+def load_pae(
+    npz_path: str | None = None, json_path: str | None = None
+) -> Optional[np.ndarray]:
+    """Load a PAE matrix from npz file or confidence JSON (must stay 2D)."""
+    # Try npz file first
+    if npz_path and os.path.exists(npz_path):
+        try:
+            data = np.load(npz_path)
+            print(f"  [PAE] npz keys: {data.files}")
+            keys = ["pae", "predicted_aligned_error", "data"]
+            for k in keys:
+                if k in data.files:
+                    arr = data[k]
+                    if arr.ndim == 3:
+                        arr = arr[0]
+                    if arr.ndim == 2:
+                        print(
+                            f"  [PAE] Loaded from npz key '{k}': shape={arr.shape}"
+                        )
+                        return arr
+            # Fallback to first array
+            arr = data[data.files[0]]
+            print(
+                f"  [PAE] Trying first array '{data.files[0]}': shape={arr.shape}"
+            )
+            if arr.ndim == 3:
+                arr = arr[0]
+            if arr.ndim == 2:
+                return arr
+        except Exception as exc:
+            print(f"  [PAE] npz load error: {exc}")
+
+    # Fallback: try to extract PAE from confidence JSON
+    if json_path and os.path.exists(json_path):
+        try:
+            with open(json_path) as fh:
+                data = json.load(fh)
+            print(f"  [PAE] JSON keys: {list(data.keys())}")
+            for k in ("pae", "predicted_aligned_error", "pae_matrix"):
+                if k in data:
+                    arr = np.array(data[k])
+                    if arr.ndim == 2:
+                        print(
+                            f"  [PAE] Loaded from JSON key '{k}': shape={arr.shape}"
+                        )
+                        return arr
+                    if arr.ndim == 3:
+                        arr = arr[0]
+                        if arr.ndim == 2:
+                            print(
+                                f"  [PAE] Loaded from JSON key '{k}' (squeezed): shape={arr.shape}"
+                            )
+                            return arr
+        except Exception as exc:
+            print(f"  [PAE] JSON load error: {exc}")
+
+    print(f"  [PAE] No PAE data found (npz={npz_path}, json={json_path})")
+    return None

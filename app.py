@@ -165,13 +165,33 @@ def predict_structure(
         conf = find_confidence_files(os.path.dirname(result))
         if not conf["pae"] and not conf["plddt"]:
             conf = find_confidence_files(job_dir)
+
+        # Debug: log what we found and list the actual output directory
+        log(
+            f"Confidence files: pae={conf['pae']}, plddt={conf['plddt']}, json={conf['confidence_json']}"
+        )
+        struct_dir = os.path.dirname(result)
+        try:
+            import glob as _g
+
+            all_files = _g.glob(os.path.join(struct_dir, "*"))
+            log(
+                f"Files in {struct_dir}: {[os.path.basename(f) for f in all_files]}"
+            )
+        except Exception:
+            pass
+
         pae_img = plddt_img = None
         plddt_scores = None
 
-        if conf["pae"]:
-            pae_matrix = load_pae(conf["pae"])
+        if conf["pae"] or conf["confidence_json"]:
+            pae_matrix = load_pae(
+                npz_path=conf["pae"],
+                json_path=conf["confidence_json"],
+            )
             if pae_matrix is not None:
                 pae_img = plot_pae(pae_matrix, os.path.join(job_dir, "pae.png"))
+                log(f"Created PAE plot: shape={pae_matrix.shape}")
 
         plddt_scores = load_plddt(
             npz_path=conf["plddt"],
