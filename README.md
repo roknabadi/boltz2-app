@@ -1,106 +1,70 @@
 # 🧬 Boltz-2 Structure Prediction App
 
-A Gradio web interface for **Boltz-2** protein structure prediction, designed for easy deployment on **Lightning AI**.
+A Gradio web app for [Boltz-2](https://github.com/jwohlwend/boltz) protein structure prediction, designed for deployment on [Lightning AI Studios](https://lightning.ai).
 
 ## ✨ Features
 
-- **Protein Structure Prediction** — Predict 3D structures with AlphaFold3-level accuracy
-- **Ligand Docking** — Include small molecules (SMILES) for protein-ligand complex prediction
-- **Oligomer Support** — Model dimers, trimers, tetramers, and beyond
-- **Cyclic Peptides** — Predict cyclic peptide structures
-- **Interactive 3D Viewer** — Visualize structures colored by pLDDT confidence (AlphaFold-style)
-- **Confidence Plots** — PAE heatmaps and per-residue pLDDT charts
-- **Download Results** — Export structures in CIF format
+- **Protein structure prediction** — AlphaFold3-level accuracy via Boltz-2
+- **Ligand docking** — SMILES input for protein–ligand complex prediction
+- **Oligomer support** — dimers, trimers, tetramers, and beyond
+- **Cyclic peptides** — toggle for N→C-connected structures
+- **Interactive 3D viewer** — pLDDT-colored structures via 3Dmol.js
+- **Confidence plots** — PAE heatmaps and per-residue pLDDT charts
+- **CIF download** — export structures for further analysis
 
-## 🚀 Quick Start on Lightning AI
+## 🚀 Deploy on Lightning AI
 
-### Option 1: Lightning AI Studio (Recommended)
-
-1. **Create a new Studio** on [Lightning AI](https://lightning.ai)
-   - Select a **GPU machine** (A10G or better recommended)
-   - Choose **Python 3.10+** environment
-
-2. **Clone this repo** into the Studio:
+1. Create a new [Studio](https://lightning.ai) with a **GPU** (A10G recommended, L4 minimum)
+2. Clone the repo in the Studio terminal:
    ```bash
    git clone https://github.com/roknabadi/boltz2-app.git
    cd boltz2-app
    ```
-
-3. **Run the app**:
+3. Launch:
    ```bash
    bash run.sh
    ```
+4. Open the app via the Studio's **"Open App"** button or port `7860`
 
-4. **Access the app** — Click "Open App" in Lightning AI or visit `http://localhost:7860`
+The first run downloads ~6 GB of model weights. These persist in the Studio, so subsequent runs start immediately. You can share a public URL directly from the Studio UI.
 
-### Option 2: Deploy as a Lightning App
+## 💻 Run Locally
 
-Use the included `lightning.yaml` to deploy:
-
-```bash
-lightning run app lightning_app.py --cloud
-```
-
-## 📦 Local Installation
+Requires a CUDA GPU and Python 3.10+.
 
 ```bash
 git clone https://github.com/roknabadi/boltz2-app.git
 cd boltz2-app
-
-python -m venv venv
-source venv/bin/activate
-
 pip install -r requirements.txt
 python app.py
 ```
 
-The app will be available at `http://localhost:7860`.
+Visit `http://localhost:7860`.
 
 ## 🎯 Usage
 
-### Protein Input
+**Protein input:** paste a FASTA sequence or raw amino acid string.
 
-Enter your protein sequence in FASTA format or as a raw sequence:
+**Ligand (optional):** enter a SMILES string to predict a protein–ligand complex.
 
-```
->my_protein
-MKWVTFISLLLLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPFEDHVK
-```
+**Advanced settings:**
 
-### Ligand Input (Optional)
-
-Provide a SMILES string for protein-ligand complex prediction:
-
-```
-CC(=O)Oc1ccccc1C(=O)O
-```
-
-### Advanced Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| MSA Server | Always on | ColabFold MSA server (required for accuracy) |
-| Sampling Steps | 50 | More steps = higher quality, slower runtime |
-| Number of Copies | 1 | Set >1 for oligomers (dimer, trimer, etc.) |
-| Cyclic | Off | Enable for cyclic peptide prediction |
-
-## 📊 Output
-
-- **Interactive 3D Structure** — Rotatable viewer with pLDDT coloring
-- **Confidence Metrics** — pLDDT, pTM, and binding affinity scores
-- **PAE Plot** — Predicted Aligned Error heatmap
-- **pLDDT Plot** — Per-residue confidence chart
-- **Downloadable CIF** — Structure file for further analysis
+| Setting | Default | Notes |
+|---|---|---|
+| MSA Server | Always on | ColabFold server, required for accuracy |
+| Sampling Steps | 50 | Higher → better quality, slower |
+| Copies | 1 | >1 for oligomers (dimer, trimer, …) |
+| Cyclic | Off | For cyclic peptide prediction |
 
 ## ⚡ Performance
 
-| Hardware | Typical Prediction Time |
-|----------|------------------------|
-| A10G GPU | 2–5 minutes |
-| A100 GPU | 1–3 minutes |
-| CPU only | 30–60 minutes |
+| GPU | Typical time |
+|---|---|
+| A10G | 2–5 min |
+| A100 | 1–3 min |
+| L4 | 3–8 min |
 
-Times vary with sequence length. Sequences >1000 residues automatically reduce recycling steps to stay within GPU memory.
+Sequences >1000 residues automatically reduce recycling steps to stay within GPU memory.
 
 ## 📁 Project Structure
 
@@ -110,35 +74,30 @@ boltz2-app/
 ├── prediction.py       # Input validation, YAML generation, Boltz-2 runner
 ├── visualization.py    # 3Dmol.js viewer, PAE/pLDDT plots, confidence parsing
 ├── style.py            # Gradio theme and CSS
-├── lightning.yaml      # Lightning AI deployment config
-├── lightning_app.py    # Lightning AI app wrapper
 ├── requirements.txt    # Python dependencies
-├── run.sh              # Launch script
+├── run.sh              # Setup and launch script
 ├── LICENSE             # MIT License
-└── README.md           # This file
+└── README.md
 ```
 
-## 🔧 Configuration
+## 🔧 Environment Variables
 
 ```bash
-# Optional: custom cache directory for model weights (~6 GB)
-export BOLTZ_CACHE=/path/to/cache
-
-# Optional: select CUDA device
-export CUDA_VISIBLE_DEVICES=0
+export BOLTZ_CACHE=/path/to/cache    # Custom model weight location (~6 GB)
+export CUDA_VISIBLE_DEVICES=0        # Select GPU
 ```
 
 ## 🔬 About Boltz-2
 
-[Boltz-2](https://github.com/jwohlwend/boltz) is an open-source protein structure prediction model from the MIT Jameel Clinic that approaches AlphaFold3-level accuracy. It supports protein, DNA, RNA, and small molecule complex prediction, plus binding affinity estimation. The model is released under the MIT license.
+[Boltz-2](https://github.com/jwohlwend/boltz) is an open-source structure prediction model from the MIT Jameel Clinic. It supports protein, DNA, RNA, and small molecule complexes, plus binding affinity estimation. MIT licensed.
 
 ## 🤝 Acknowledgments
 
 - **Boltz-2**: Jeremy Wohlwend, Gabriele Corso, Saro Passaro, and the MIT Jameel Clinic team
-- **3Dmol.js**: Interactive molecular visualization
-- **Gradio**: Web interface framework
-- **Lightning AI**: Deployment platform
+- **3Dmol.js**: Molecular visualization
+- **Gradio**: Web interface
+- **Lightning AI**: GPU cloud platform
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+[MIT](LICENSE)

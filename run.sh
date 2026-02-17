@@ -1,60 +1,46 @@
 #!/bin/bash
-# Lightning AI Studio Launch Script for Boltz-2 Structure Prediction App
-# 
-# This script sets up and launches the Gradio app in a Lightning AI Studio
-#
-# Usage: bash run.sh
-
+# Boltz-2 Structure Prediction App — setup and launch
 set -e
 
-echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║         Boltz-2 Structure Prediction App                     ║"
-echo "╚══════════════════════════════════════════════════════════════╝"
+echo "══════════════════════════════════════════════════════════"
+echo "  Boltz-2 Structure Prediction App"
+echo "══════════════════════════════════════════════════════════"
 echo ""
 
-# Check if running in Lightning AI Studio
+# Detect environment
 if [ -n "$LIGHTNING_CLOUDSPACE_ID" ]; then
-    echo "✓ Running in Lightning AI Studio"
+    echo "✓ Lightning AI Studio detected"
 else
-    echo "⚠ Not detected as Lightning AI Studio - running locally"
+    echo "Running locally"
+    # Create venv if not in a Studio or existing venv
+    if [ -z "$VIRTUAL_ENV" ] && [ ! -d "venv" ]; then
+        echo "Creating virtual environment..."
+        python -m venv venv
+    fi
+    if [ -d "venv" ]; then
+        source venv/bin/activate
+    fi
 fi
 
-# Create virtual environment if it doesn't exist
-if [ ! -d "venv" ]; then
-    echo ""
-    echo "📦 Creating virtual environment..."
-    python -m venv venv
-fi
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Install/update dependencies
-echo ""
-echo "📦 Installing dependencies..."
+# Install dependencies
+echo "Installing dependencies..."
 pip install --upgrade pip -q
 pip install -r requirements.txt -q
 
-# Ensure CUDA kernels are available (critical for Boltz-2)
-echo "📦 Installing CUDA kernel optimizations..."
-pip install cuequivariance-ops-torch-cu12 -q 2>/dev/null || echo "⚠ CUDA kernels not installed (will use fallback)"
+# Optional: CUDA kernel optimizations
+pip install cuequivariance-ops-torch-cu12 -q 2>/dev/null || true
 
-# Check for GPU
+# GPU check
 echo ""
-if python -c "import torch; print(torch.cuda.is_available())" 2>/dev/null | grep -q "True"; then
-    echo "✓ GPU detected - predictions will be fast!"
+if python -c "import torch; assert torch.cuda.is_available()" 2>/dev/null; then
+    echo "✓ GPU available"
 else
-    echo "⚠ No GPU detected - predictions will be slower"
+    echo "⚠ No GPU detected — predictions will be slow"
 fi
 
-# Launch the app
+# Launch
 echo ""
-echo "🚀 Launching Boltz-2 Structure Prediction App..."
+echo "Starting app on http://localhost:7860"
+echo "══════════════════════════════════════════════════════════"
 echo ""
-echo "═══════════════════════════════════════════════════════════════"
-echo " App will be available at: http://localhost:7860"
-echo " In Lightning AI Studio, click 'Open App' to view"
-echo "═══════════════════════════════════════════════════════════════"
-echo ""
-
 python app.py
