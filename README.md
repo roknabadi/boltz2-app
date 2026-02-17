@@ -14,7 +14,7 @@ A Gradio web app for [Boltz-2](https://github.com/jwohlwend/boltz) protein struc
 
 ## 🚀 Deploy on Lightning AI
 
-1. Create a new [Studio](https://lightning.ai) with a **GPU** (A10G recommended, L4 minimum)
+1. Create a new [Studio](https://lightning.ai) with a **GPU** (L4 or above)
 2. Clone the repo in the Studio terminal:
    ```bash
    git clone https://github.com/roknabadi/boltz2-app.git
@@ -60,9 +60,9 @@ Visit `http://localhost:7860`.
 
 | GPU | Typical time |
 |---|---|
-| A10G | 2–5 min |
-| A100 | 1–3 min |
 | L4 | 3–8 min |
+| L40S | 1–4 min |
+| A100 | 1–3 min |
 
 Sequences >1000 residues automatically reduce recycling steps to stay within GPU memory.
 
