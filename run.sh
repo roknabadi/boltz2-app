@@ -1,6 +1,5 @@
 #!/bin/bash
 # Boltz-2 Structure Prediction App — setup and launch
-set -e
 
 echo "══════════════════════════════════════════════════════════"
 echo "  Boltz-2 Structure Prediction App"
@@ -24,7 +23,7 @@ fi
 # Install dependencies
 echo "Installing dependencies..."
 pip install --upgrade pip -q
-pip install -r requirements.txt -q
+pip install -r requirements.txt -q || echo "⚠ Some dependencies failed — check errors above"
 
 # Optional: CUDA kernel optimizations
 pip install cuequivariance-ops-torch-cu12 -q 2>/dev/null || true
@@ -39,7 +38,8 @@ fi
 
 # Launch
 echo ""
-echo "Starting app on http://localhost:7860"
+echo "Starting app on port 7860"
+echo "Open Port Viewer → + New Port → 7860"
 echo "══════════════════════════════════════════════════════════"
 echo ""
-python app.py
+exec python app.py

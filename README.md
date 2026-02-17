@@ -24,7 +24,7 @@ A Gradio web app for [Boltz-2](https://github.com/jwohlwend/boltz) protein struc
    ```bash
    bash run.sh
    ```
-4. Open the app via the Studio's **"Open App"** button or port `7860`
+4. Open the **Port Viewer** (plug icon in the right sidebar) → click **+ New Port** → enter `7860`
 
 The first run downloads ~6 GB of model weights. These persist in the Studio, so subsequent runs start immediately. You can share a public URL directly from the Studio UI.
 
